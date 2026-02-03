@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Signal — Informasi Crypto & Saham | By VICKO</title>
+
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    :root {
+      --bg: #0d1117;
+      --card: #161b22;
+      --text: #e6edf3;
+      --muted: #8b949e;
+      --primary: #58a6ff;
+      --green: #3fb950;
+      --red: #f85149;
+      --purple: #c300ff;
+      --border: #30363d;
+    }
+    [data-theme="light"] {
+      --bg: #ffffff;
+      --card: #f6f8fa;
+      --text: #24292f;
+      --muted: #57606a;
+      --primary: #0969da;
+      --green: #1a7f37;
+      --red: #d1242f;
+      --purple: #9c27b0;
+      --border: #d0d7de;
+    }
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      transition: all 0.3s;
+    }
+    .navbar {
+      position: sticky;
+      top: 0;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      z-index: 100;
+      padding: 1rem;
+    }
+    .nav-container {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .logo { font-size: 1.6rem; font-weight: bold; color: var(--primary); }
+    .nav-links { display: flex; gap: 1.8rem; }
+    .nav-links a { color: var(--text); text-decoration: none; }
+    .nav-links a:hover { color: var(--primary); }
+    .hamburger { display: none; font-size: 1.8rem; background: none; border: none; color: var(--text); cursor: pointer; }
+    .theme-toggle { background: none; border: none; font-size: 1.4rem; cursor: pointer; color: var(--text); }
+
+    .hero {
+      position: relative;
+      height: 70vh;
+      min-height: 400px;
+      overflow: hidden;
+      background: #0a0015;
+    }
+    .hero video {
+      position: absolute;
+      top: 50%; left: 50%;
+      min-width: 100%; min-height: 100%;
+      transform: translate(-50%, -50%);
+      object-fit: cover;
+    }
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(10,0,21,0.68);
+      z-index: 1;
+    }
+    .hero-content {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 2;
+      text-align: center;
+      color: white;
+      text-shadow: 0 4px 12px #000;
+    }
+    .hero-content h1 { font-size: clamp(4rem, 12vw, 7rem); color: var(--purple); margin: 0; }
+
+    .container { max-width: 1100px; margin: 0 auto; padding: 1.5rem 1rem; }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.6rem;
+      margin-bottom: 1.8rem;
+    }
+    .card h2 {
+      color: var(--primary);
+      margin-bottom: 1rem;
+      font-size: 1.5rem;
+      border-left: 4px solid var(--primary);
+      padding-left: 0.8rem;
+    }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+    .price { font-size: 2.4rem; font-weight: bold; color: var(--green); margin: 0.4rem 0; }
+    .change-up { color: var(--green); }
+    .change-down { color: var(--red); }
+
+    .highlight {
+      background: rgba(255,255,255,0.04);
+      padding: 1rem;
+      border-radius: 8px;
+      margin: 0.8rem 0;
+      border: 1px solid var(--border);
+    }
+
+    .btn {
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 6px;
+      color: white;
+      cursor: pointer;
+      font-size: 0.95rem;
+      margin: 0.5rem 0.5rem 0 0;
+      display: inline-block;
+      text-decoration: none;
+    }
+    .btn-copy { background: var(--primary); }
+    .btn-copy.copied { background: var(--green); }
+    .btn-wa { background: #25D366; }
+    .btn-email { background: #ea4335; }
+
+    .skeleton {
+      background: linear-gradient(90deg, #2d3748 25%, #1e293b 50%, #2d3748 75%);
+      background-size: 200% 100%;
+      animation: loading 1.5s infinite;
+      border-radius: 6px;
+      height: 1.4em;
+      width: 60%;
+      display: inline-block;
+    }
+    @keyframes loading { 0% {background-position: 200% 0;} 100% {background-position: -200% 0;} }
+
+    .error-msg { color: var(--red); font-weight: 500; }
+
+    #back-to-top {
+      position: fixed;
+      bottom: 24px; right: 24px;
+      width: 48px; height: 48px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: white;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.3s, transform 0.2s;
+      z-index: 999;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    }
+    #back-to-top.show { opacity: 0.9; }
+
+    @media (max-width: 768px) {
+      .grid-2 { grid-template-columns: 1fr; }
+      .nav-links { 
+        display: none; 
+        flex-direction: column; 
+        position: absolute; 
+        top: 100%; left: 0; right: 0; 
+        background: var(--bg); 
+        padding: 1rem; 
+        border-bottom: 1px solid var(--border);
+      }
+      .nav-links.active { display: flex; }
+      .hamburger { display: block; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="nav-container">
+      <div class="logo">SIGNAL</div>
+      <div class="nav-links" id="navLinks">
+        <a href="#status">Status Pasar</a>
+        <a href="#teknis">Teknis</a>
+        <a href="#tentang">Tentang</a>
+        <a href="#link">Link</a>
+        <a href="#contact">Hubungi Saya</a>
+      </div>
+      <div style="display:flex; align-items:center; gap:1.2rem;">
+        <button class="theme-toggle" id="themeToggle">🌙</button>
+        <button class="hamburger" id="hamburger">☰</button>
+      </div>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <video autoplay muted loop playsinline preload="metadata">
+      <source src="https://drive.google.com/uc?export=download&id=1McGKOcY8OIGrqW_IvFo5enCMi07PsmSV">
+    </video>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <h1>SIGNAL</h1>
+      <p style="font-size:1.7rem; margin:1rem 0;">Crypto & Saham Signals Real-time</p>
+      <p style="font-size:1.3rem; opacity:0.9;">By VICKO</p>
+    </div>
+  </section>
+
+  <div class="container">
+
+    <section id="status" class="card">
+      <h2>Status Pasar Saat Ini</h2>
+      <div class="grid-2">
+        <div>
+          <div>Harga Saat Ini</div>
+          <div class="price" id="live-price"><div class="skeleton"></div></div>
+          <div><span id="change-24h">—</span> (24 jam)</div>
+        </div>
+        <div>
+          <div>Market Cap</div>
+          <div style="font-size:1.6rem; font-weight:bold;" id="market-cap"><div class="skeleton"></div></div>
+          <div>Volume 24 jam: <span id="volume-24h"><div class="skeleton" style="width:50%;"></div></span></div>
+        </div>
+      </div>
+      <p style="text-align:center; margin-top:1.2rem; color:var(--muted); font-size:0.9rem;">
+        Data CoinGecko • Update terakhir: <span id="last-updated">Memuat...</span>
+      </p>
+    </section>
+
+    <section id="teknis" class="card">
+      <h2>Informasi Teknis</h2>
+      <div class="grid-2">
+        <div>
+          <div class="highlight"><strong>Token</strong><br>SIGNAL (SIGN)</div>
+          <div class="highlight"><strong>Blockchain</strong><br>Ethereum • Solana • BSC</div>
+        </div>
+        <div>
+          <div class="highlight">
+            <strong>Contract (contoh)</strong><br>
+            <code id="contract">9gP2kXyZ...abcDEF123xyz789</code>
+            <button class="btn btn-copy" id="copyContract">Copy</button>
+          </div>
+          <div class="highlight"><strong>Total Supply</strong><br>1,000,000,000 SIGNAL</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="tentang" class="card">
+      <h2>Apa itu Signal?</h2>
+      <p>Proyek yang menyediakan trading signals real-time, analisis otomatis, dan utilitas DeFi untuk trader crypto & saham.</p>
+      <ul style="margin:1rem 0 1rem 2rem; list-style:square;">
+        <li>Signal buy/sell real-time</li>
+        <li>Analisis teknikal otomatis</li>
+        <li>Integrasi Telegram & Discord</li>
+        <li>Reward staking/reflection</li>
+      </ul>
+    </section>
+
+    <section id="link" class="card">
+      <h2>Link Penting</h2>
+      <ul style="list-style:none; margin-top:1rem; line-height:2;">
+        <li>→ <a href="#" style="color:var(--primary);">Official Website</a></li>
+        <li>→ <a href="#" style="color:var(--primary);">Contract Address</a></li>
+        <li>→ <a href="#" style="color:var(--primary);">Telegram</a></li>
+        <li>→ <a href="#" style="color:var(--primary);">Twitter / X</a></li>
+        <li>→ <a href="#" style="color:var(--primary);">DexScreener</a></li>
+      </ul>
+    </section>
+
+    <section id="contact" class="card contact-card" style="border-color:#7c3aed; background:#1e0a2e;">
+      <h2 style="color:#a78bfa; border-left-color:#a78bfa;">Hubungi Saya</h2>
+      <p style="margin:1rem 0;">
+        Pertanyaan, saran, atau diskusi tentang Signal? Silakan hubungi saya:
+      </p>
+      <div style="margin-top:1.2rem;">
+        <a href="https://wa.me/6282156460863?text=Halo%20Vicko%2C%20saya%20mau%20bertanya%20tentang%20Signal..." 
+           class="btn btn-wa" target="_blank" rel="noopener noreferrer">
+          📱 WhatsApp
+        </a>
+        <a href="mailto:vicko.djulian@gmail.com?subject=Pertanyaan%20tentang%20Signal" 
+           class="btn btn-email">
+          ✉️ Email
+        </a>
+      </div>
+    </section>
+
+    <section class="card" style="background:#1a0033; border-color:#ff3366;">
+      <h2 style="color:#ff3366; border-left-color:#ff3366;">Peringatan Risiko</h2>
+      <p>
+        <strong>Hanya untuk edukasi & hiburan.</strong><br>
+        <strong>Bukan saran investasi.</strong><br><br>
+        Crypto & saham sangat berisiko. Anda bisa kehilangan seluruh modal.<br>
+        Selalu DYOR dan gunakan dana yang siap hilang.
+      </p>
+    </section>
+
+  </div>
+
+  <footer style="text-align:center; padding:2.5rem 1rem; color:var(--muted); border-top:1px solid var(--border);">
+    <p>Dibuat oleh <strong>VICKO</strong> • 3 Februari 2026</p>
+    <p>Data real-time CoinGecko • Selalu DYOR</p>
+  </footer>
+
+  <button id="back-to-top">↑</button>
+
+  <script>
+    // Theme toggle
+    const toggle = document.getElementById('themeToggle');
+    const html = document.documentElement;
+    function setTheme(theme) {
+      html.dataset.theme = theme;
+      toggle.textContent = theme === 'dark' ? '🌙' : '☀️';
+      localStorage.setItem('theme', theme);
+    }
+    setTheme(localStorage.getItem('theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
+    toggle.onclick = () => setTheme(html.dataset.theme === 'dark' ? 'light' : 'dark');
+
+    // Hamburger
+    document.getElementById('hamburger').onclick = () => {
+      document.getElementById('navLinks').classList.toggle('active');
+    };
+
+    // Back to top
+    const btt = document.getElementById('back-to-top');
+    window.onscroll = () => btt.classList.toggle('show', scrollY > 400);
+    btt.onclick = () => scrollTo({top:0, behavior:'smooth'});
+
+    // Copy contract
+    document.getElementById('copyContract').onclick = async () => {
+      try {
+        await navigator.clipboard.writeText(document.getElementById('contract').textContent);
+        const btn = document.getElementById('copyContract');
+        btn.textContent = 'Copied!';
+        btn.classList.add('copied');
+        setTimeout(() => {
+          btn.textContent = 'Copy';
+          btn.classList.remove('copied');
+        }, 2000);
+      } catch {
+        alert('Gagal copy');
+      }
+    };
+
+    // CoinGecko - error handling diperbaiki
+    const COIN_ID = "bitcoin";  // ← ubah di sini jika ingin coin lain
+    const VS = "usd";
+
+    async function updatePrice() {
+      const els = {
+        price: document.getElementById('live-price'),
+        change: document.getElementById('change-24h'),
+        mcap: document.getElementById('market-cap'),
+        vol: document.getElementById('volume-24h'),
+        updated: document.getElementById('last-updated')
+      };
+
+      try {
+        els.price.innerHTML = '<div class="skeleton"></div>';
+        els.change.textContent = '—';
+        els.mcap.innerHTML = '<div class="skeleton"></div>';
+        els.vol.innerHTML = '<div class="skeleton" style="width:50%"></div>';
+
+        const res = await fetch(
+          `https://api.coingecko.com/api/v3/simple/price?ids=\( {COIN_ID}&vs_currencies= \){VS}&include_24hr_change=true&include_24hr_vol=true&include_market_cap=true`
+        );
+
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+        const data = await res.json();
+        const coin = data[COIN_ID];
+
+        if (!coin) throw new Error("Token tidak ditemukan");
+
+        els.price.textContent = `\[ {coin.usd.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}`;
+        const chg = coin.usd_24h_change?.toFixed(2) || 0;
+        els.change.textContent = `\( {chg >= 0 ? '+' : ''} \){chg}% (24 jam)`;
+        els.change.className = chg >= 0 ? 'change-up' : 'change-down';
+
+        els.mcap.textContent = coin.usd_market_cap
+          ? ` \]{(coin.usd_market_cap / 1e9).toFixed(2)} Miliar`
+          : '—';
+
+        els.vol.textContent = coin.usd_24h_vol
+          ? `$${(coin.usd_24h_vol / 1e6).toFixed(1)} Juta`
+          : '—';
+
+        els.updated.textContent = new Date().toLocaleString('id-ID', {dateStyle:'medium', timeStyle:'short'});
+
+      } catch (err) {
+        console.warn("CoinGecko error:", err.message || err);
+
+        els.price.textContent = "—";
+        els.change.textContent = "Gagal memuat";
+        els.change.className = "change-down";
+        els.mcap.textContent = "—";
+        els.vol.textContent = "—";
+        els.updated.innerHTML = '<span class="error-msg">Gagal memuat data • Coba lagi nanti</span>';
+      }
+    }
+
+    updatePrice();
+    setInterval(updatePrice, 60000);
+  </script>
+</body>
+</html>
